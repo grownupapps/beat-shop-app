@@ -1,0 +1,23 @@
+{
+  "name": "beat-shop-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@shopify/shopify-api": "^11.6.0",
+    "@shopify/shopify-app-express": "^5.0.8",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-fileupload": "^1.5.1",
+    "express-session": "^1.18.1",
+    "mongodb": "^6.11.0",
+    "mongoose": "^8.8.2"
+  }
+}
