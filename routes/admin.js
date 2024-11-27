@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require('path');
 const Beat = require('../Models/beat');
 const requireLogin = require('../middleware/auth');
-
+const fs = require('fs');
 // Login-Seite
 router.get('/login', (req, res) => {
     res.send(`
@@ -83,7 +83,6 @@ router.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/login');
 });
-
 // Admin Dashboard
 router.get('/admin', requireLogin, (req, res) => {
     res.send(`
@@ -177,6 +176,32 @@ router.get('/admin', requireLogin, (req, res) => {
                     .beat-info p {
                         margin: 5px 0;
                     }
+                    .beat-actions {
+                        margin-top: 10px;
+                        display: flex;
+                        gap: 10px;
+                    }
+                    .edit-btn, .delete-btn {
+                        padding: 6px 12px;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-weight: 500;
+                    }
+                    .edit-btn {
+                        background: #2c5282;
+                        color: white;
+                    }
+                    .delete-btn {
+                        background: #e53e3e;
+                        color: white;
+                    }
+                    .edit-btn:hover {
+                        background: #2a4365;
+                    }
+                    .delete-btn:hover {
+                        background: #c53030;
+                    }
                 </style>
             </head>
             <body>
@@ -236,35 +261,72 @@ router.get('/admin', requireLogin, (req, res) => {
                         <button type="submit">Hochladen</button>
                     </form>
                 </div>
+
                 <div class="beats-list">
                     <h3>Deine Beats</h3>
                     <div id="beatsList"></div>
                 </div>
 
                 <script>
-                    fetch('/beats-list')
-                        .then(res => res.json())
-                        .then(beats => {
-                            const beatsListDiv = document.getElementById('beatsList');
-                            beats.forEach(beat => {
-                                const beatDiv = document.createElement('div');
-                                beatDiv.className = 'beat-item';
-                                beatDiv.innerHTML = \`
-                                    <div class="beat-content">
-                                        \${beat.coverPath ? \`<img src="/uploads/\${beat.coverPath}" class="beat-cover" alt="\${beat.title}">\` : ''}
-                                        <div class="beat-info">
-                                            <h3>\${beat.title}</h3>
-                                            \${beat.description ? \`<p>\${beat.description}</p>\` : ''}
-                                            <p>BPM: \${beat.bpm || 'N/A'} | Key: \${beat.key || 'N/A'}</p>
+                async function loadBeats() {
+                    try {
+                        const response = await fetch('/beats-list');
+                        const beats = await response.json();
+                        const beatsListDiv = document.getElementById('beatsList');
+                        beatsListDiv.innerHTML = '';
+                        
+                        beats.forEach(beat => {
+                            const beatDiv = document.createElement('div');
+                            beatDiv.className = 'beat-item';
+                            beatDiv.innerHTML = \`
+                                <div class="beat-content">
+                                    \${beat.coverPath ? \`<img src="/uploads/\${beat.coverPath}" class="beat-cover" alt="\${beat.title}">\` : ''}
+                                    <div class="beat-info">
+                                        <h3>\${beat.title}</h3>
+                                        \${beat.description ? \`<p>\${beat.description}</p>\` : ''}
+                                        <p>BPM: \${beat.bpm || 'N/A'} | Key: \${beat.key || 'N/A'}</p>
+                                        <div class="beat-actions">
+                                            <button onclick="editBeat('\${beat._id}')" class="edit-btn">Bearbeiten</button>
+                                            <button onclick="deleteBeat('\${beat._id}')" class="delete-btn">Löschen</button>
                                         </div>
                                     </div>
-                                    <audio controls>
-                                        <source src="/uploads/\${beat.filePath}" type="audio/mpeg">
-                                    </audio>
-                                \`;
-                                beatsListDiv.appendChild(beatDiv);
-                            });
+                                </div>
+                                <audio controls>
+                                    <source src="/uploads/\${beat.filePath}" type="audio/mpeg">
+                                </audio>
+                            \`;
+                            beatsListDiv.appendChild(beatDiv);
                         });
+                    } catch (error) {
+                        console.error('Fehler beim Laden der Beats:', error);
+                    }
+                }
+
+                async function deleteBeat(beatId) {
+                    if (!confirm('Möchtest du diesen Beat wirklich löschen?')) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(\`/admin/beat/\${beatId}\`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            alert('Beat erfolgreich gelöscht');
+                            loadBeats(); // Liste neu laden
+                        } else {
+                            const error = await response.json();
+                            alert('Fehler beim Löschen: ' + error.message);
+                        }
+                    } catch (error) {
+                        console.error('Fehler:', error);
+                        alert('Fehler beim Löschen des Beats');
+                    }
+                }
+
+                // Initial Beats laden
+                loadBeats();
                 </script>
             </body>
         </html>
@@ -317,6 +379,35 @@ router.get('/beats-list', async (req, res) => {
     } catch (error) {
         console.error('Error fetching beats:', error);
         res.status(500).json([]);
+    }
+});
+
+// Beat löschen
+router.delete('/admin/beat/:id', requireLogin, async (req, res) => {
+    try {
+        const beat = await Beat.findById(req.params.id);
+        if (!beat) {
+            return res.status(404).json({ error: 'Beat nicht gefunden' });
+        }
+
+        // Dateien löschen
+        if (beat.filePath) {
+            const beatFilePath = path.join(__dirname, '../uploads', beat.filePath);
+            fs.unlink(beatFilePath, err => {
+                if (err) console.error('Fehler beim Löschen der Beat-Datei:', err);
+            });
+        }
+        if (beat.coverPath) {
+            const coverFilePath = path.join(__dirname, '../uploads', beat.coverPath);
+            fs.unlink(coverFilePath, err => {
+                if (err) console.error('Fehler beim Löschen des Covers:', err);
+            });
+        }
+
+        await Beat.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Serverfehler beim Löschen' });
     }
 });
 
