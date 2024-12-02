@@ -4,6 +4,12 @@ const path = require('path');
 const Beat = require('../Models/beat');
 const requireLogin = require('../middleware/auth');
 const fs = require('fs');
+
+
+
+
+
+
 // Login-Seite
 router.get('/login', (req, res) => {
     res.send(`
@@ -91,116 +97,116 @@ router.get('/admin', requireLogin, (req, res) => {
             <head>
                 <title>Producer Dashboard</title>
                 <style>
-                    .form-group {
-                        margin-bottom: 15px;
-                        text-align: left;
-                    }
-                    .form-group label {
-                        display: block;
-                        margin-bottom: 5px;
-                        font-weight: bold;
-                    }
-                    .form-group input[type="text"],
-                    .form-group input[type="number"],
-                    .form-group textarea,
-                    .form-group select {
-                        width: 100%;
-                        padding: 8px;
-                        border: 1px solid #ddd;
-                        border-radius: 4px;
-                    }
-                    #coverPreview {
-                        margin-top: 10px;
-                        max-width: 200px;
-                        max-height: 200px;
-                    }
-                    #coverPreview img {
-                        width: 100%;
-                        height: auto;
-                        border-radius: 4px;
-                    }
                     body { 
-                        font-family: Arial; 
-                        max-width: 800px; 
+                        font-family: 'Arial', sans-serif;
+                        max-width: 1200px; 
                         margin: 20px auto; 
                         padding: 20px;
+                        background: #f5f5f5;
                     }
                     .header {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        margin-bottom: 20px;
+                        margin-bottom: 30px;
+                        padding: 20px;
+                        background: white;
+                        border-radius: 10px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                     }
                     .upload-form {
-                        border: 2px dashed #ccc;
+                        background: white;
+                        padding: 25px;
+                        border-radius: 10px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        margin-bottom: 30px;
+                    }
+                    .form-group {
+                        margin-bottom: 20px;
+                    }
+                    .form-group label {
+                        display: block;
+                        margin-bottom: 8px;
+                        font-weight: bold;
+                        color: #333;
+                    }
+                    .form-group input[type="text"],
+                    .form-group input[type="number"],
+                    .form-group input[type="url"],
+                    .form-group textarea,
+                    .form-group select {
+                        width: 100%;
+                        padding: 10px;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                        font-size: 14px;
+                    }
+                    .form-row {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 30px;
+                    }
+                    .beat-card {
+                        background: white;
                         padding: 20px;
-                        margin: 20px 0;
-                        text-align: center;
-                    }
-                    .beats-list {
-                        margin-top: 20px;
-                    }
-                    .beat-item {
-                        background: #f5f5f5;
-                        padding: 15px;
-                        margin: 10px 0;
-                        border-radius: 4px;
-                    }
-                    .logout-btn {
-                        padding: 8px 16px;
-                        background: #e53e3e;
-                        color: white;
-                        text-decoration: none;
-                        border-radius: 4px;
-                    }
-                    .logout-btn:hover {
-                        background: #c53030;
+                        margin-bottom: 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        <p>\${beat.productUrl ? \`Produkt URL: \${beat.productUrl}\` : ''}</p>
                     }
                     .beat-content {
                         display: flex;
                         gap: 20px;
-                        margin-bottom: 10px;
+                        margin-bottom: 15px;
                     }
                     .beat-cover {
-                        width: 100px;
-                        height: 100px;
+                        width: 120px;
+                        height: 120px;
                         object-fit: cover;
-                        border-radius: 4px;
+                        border-radius: 8px;
                     }
                     .beat-info {
                         flex: 1;
                     }
-                    .beat-info h3 {
-                        margin: 0 0 10px 0;
-                    }
-                    .beat-info p {
-                        margin: 5px 0;
-                    }
-                    .beat-actions {
-                        margin-top: 10px;
+                    .beat-controls {
                         display: flex;
                         gap: 10px;
+                        margin-top: 15px;
                     }
-                    .edit-btn, .delete-btn {
-                        padding: 6px 12px;
+                    .btn {
+                        padding: 8px 16px;
                         border: none;
-                        border-radius: 4px;
+                        border-radius: 5px;
                         cursor: pointer;
                         font-weight: 500;
+                        transition: all 0.3s ease;
                     }
-                    .edit-btn {
-                        background: #2c5282;
+                    .btn-primary {
+                        background: #2C5282;
                         color: white;
                     }
-                    .delete-btn {
-                        background: #e53e3e;
+                    .btn-danger {
+                        background: #E53E3E;
                         color: white;
                     }
-                    .edit-btn:hover {
-                        background: #2a4365;
+                    .btn:hover {
+                        opacity: 0.9;
+                        transform: translateY(-1px);
                     }
-                    .delete-btn:hover {
-                        background: #c53030;
+                    .logout-btn {
+                        background: #E53E3E;
+                        color: white;
+                        padding: 8px 16px;
+                        border-radius: 5px;
+                        text-decoration: none;
+                        transition: background-color 0.3s ease;
+                    }
+                    .logout-btn:hover {
+                        background: #C53030;
+                    }
+                    audio {
+                        width: 100%;
+                        margin-top: 10px;
                     }
                 </style>
             </head>
@@ -211,7 +217,7 @@ router.get('/admin', requireLogin, (req, res) => {
                 </div>
                 
                 <div class="upload-form">
-                    <h3>Beat hochladen</h3>
+                    <h2>Beat hochladen</h2>
                     <form action="/admin/upload" method="post" enctype="multipart/form-data">
                         <div class="form-group">
                             <label>Beat Datei:</label>
@@ -220,8 +226,7 @@ router.get('/admin', requireLogin, (req, res) => {
 
                         <div class="form-group">
                             <label>Cover Bild:</label>
-                            <input type="file" name="cover" accept="image/*" required>
-                            <div id="coverPreview"></div>
+                            <input type="file" name="cover" accept="image/*">
                         </div>
 
                         <div class="form-group">
@@ -234,101 +239,110 @@ router.get('/admin', requireLogin, (req, res) => {
                             <textarea name="description" rows="3"></textarea>
                         </div>
 
-                        <div class="form-group">
-                            <label>BPM:</label>
-                            <input type="number" name="bpm" min="1" max="999">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>BPM:</label>
+                                <input type="number" name="bpm" min="1" max="999">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Key/Tonart:</label>
+                                <select name="key">
+                                    <option value="">-- Wähle Key --</option>
+                                    <option value="C">C</option>
+                                    <option value="C#">C#</option>
+                                    <option value="D">D</option>
+                                    <option value="D#">D#</option>
+                                    <option value="E">E</option>
+                                    <option value="F">F</option>
+                                    <option value="F#">F#</option>
+                                    <option value="G">G</option>
+                                    <option value="G#">G#</option>
+                                    <option value="A">A</option>
+                                    <option value="A#">A#</option>
+                                    <option value="B">B</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Key/Tonart:</label>
-                            <select name="key">
-                                <option value="">-- Wähle Key --</option>
-                                <option value="C">C</option>
-                                <option value="C#">C#</option>
-                                <option value="D">D</option>
-                                <option value="D#">D#</option>
-                                <option value="E">E</option>
-                                <option value="F">F</option>
-                                <option value="F#">F#</option>
-                                <option value="G">G</option>
-                                <option value="G#">G#</option>
-                                <option value="A">A</option>
-                                <option value="A#">A#</option>
-                                <option value="B">B</option>
-                            </select>
+                            <label>Produkt URL:</label>
+                            <input type="url" name="productUrl" placeholder="https://example.com/product">
                         </div>
 
-                        <button type="submit">Hochladen</button>
+                        <button type="submit" class="btn btn-primary">Hochladen</button>
                     </form>
                 </div>
 
-                <div class="beats-list">
-                    <h3>Deine Beats</h3>
-                    <div id="beatsList"></div>
+                <div id="beatsList">
+                    <h2>Deine Beats</h2>
                 </div>
 
                 <script>
-                async function loadBeats() {
-                    try {
-                        const response = await fetch('/beats-list');
-                        const beats = await response.json();
-                        const beatsListDiv = document.getElementById('beatsList');
-                        beatsListDiv.innerHTML = '';
-                        
-                    beats.forEach(beat => {
-    const beatDiv = document.createElement('div');
-    beatDiv.className = 'beat-item';
-    beatDiv.innerHTML = \`
-        <div class="beat-content">
-            \${beat.coverPath ? \`<img src="/uploads/\${beat.coverPath}" class="beat-cover" alt="\${beat.title}">\` : ''}
-            <div class="beat-info">
-                <h3>\${beat.title}</h3>
-                \${beat.description ? \`<p>\${beat.description}</p>\` : ''}
-                <p>BPM: \${beat.bpm || 'N/A'} | Key: \${beat.key || 'N/A'}</p>
-                <div class="beat-actions">
-                    <button onclick="editBeat('\${beat._id}')" class="edit-btn">Bearbeiten</button>
-                    <button onclick="deleteBeat('\${beat._id}')" class="delete-btn">Löschen</button>
-                </div>
-            </div>
-        </div>
-        <audio controls>
-            <source src="/uploads/\${beat.filePath}" type="audio/mpeg">
-        </audio>
-    \`;
-                            beatsListDiv.appendChild(beatDiv);
-                        });
-                    } catch (error) {
-                        console.error('Fehler beim Laden der Beats:', error);
-                    }
-                }
-
-                async function deleteBeat(beatId) {
-                    if (!confirm('Möchtest du diesen Beat wirklich löschen?')) {
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch(\`/admin/beat/\${beatId}\`, {
-                            method: 'DELETE'
-                        });
-
-                        if (response.ok) {
-                            alert('Beat erfolgreich gelöscht');
-                            loadBeats(); // Liste neu laden
-                        } else {
-                            const error = await response.json();
-                            alert('Fehler beim Löschen: ' + error.message);
+                    async function loadBeats() {
+                        try {
+                            const response = await fetch('/beats-list');
+                            const beats = await response.json();
+                            const beatsListDiv = document.getElementById('beatsList');
+                            beatsListDiv.innerHTML = '<h2>Deine Beats</h2>';
+                            
+                            beats.forEach(beat => {
+                                const beatDiv = document.createElement('div');
+                                beatDiv.className = 'beat-card';
+                                beatDiv.innerHTML = \`
+                                    <div class="beat-content">
+                                        \${beat.coverPath ? \`<img src="/uploads/\${beat.coverPath}" class="beat-cover" alt="\${beat.title}">\` : ''}
+                                        <div class="beat-info">
+                                            <h3>\${beat.title}</h3>
+                                            <p>\${beat.description || ''}</p>
+                                            <p>BPM: \${beat.bpm || 'N/A'} | Key: \${beat.key || 'N/A'}</p>
+                                  <p>\${beat.productUrl ? \`Produkt URL: \${beat.productUrl}\` : ''}</p>
+                                            <div class="beat-controls">
+                                                <button onclick="editBeat('\${beat._id}')" class="btn btn-primary">Bearbeiten</button>
+                                                <button onclick="deleteBeat('\${beat._id}')" class="btn btn-danger">Löschen</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <audio controls>
+                                        <source src="/uploads/\${beat.filePath}" type="audio/mpeg">
+                                    </audio>
+                                \`;
+                                beatsListDiv.appendChild(beatDiv);
+                            });
+                        } catch (error) {
+                            console.error('Fehler beim Laden der Beats:', error);
                         }
-                    } catch (error) {
-                        console.error('Fehler:', error);
-                        alert('Fehler beim Löschen des Beats');
                     }
-                }
-                        function editBeat(beatId) {
-    window.location.href = '/admin/beat/' + beatId + '/edit';
-}
-                // Initial Beats laden
-                loadBeats();
+
+                    async function deleteBeat(beatId) {
+                        if (!confirm('Möchtest du diesen Beat wirklich löschen?')) {
+                            return;
+                        }
+
+                        try {
+                            const response = await fetch(\`/admin/beat/\${beatId}\`, {
+                                method: 'DELETE'
+                            });
+
+                            if (response.ok) {
+                                alert('Beat erfolgreich gelöscht');
+                                loadBeats();
+                            } else {
+                                const error = await response.json();
+                                alert('Fehler beim Löschen: ' + error.message);
+                            }
+                        } catch (error) {
+                            console.error('Fehler:', error);
+                            alert('Fehler beim Löschen des Beats');
+                        }
+                    }
+
+                    function editBeat(beatId) {
+                        window.location.href = '/admin/beat/' + beatId + '/edit';
+                    }
+
+                    // Initial Beats laden
+                    loadBeats();
                 </script>
             </body>
         </html>
@@ -336,6 +350,7 @@ router.get('/admin', requireLogin, (req, res) => {
 });
 
 // Upload-Route
+// In admin.js, Update der Upload-Route
 router.post('/admin/upload', requireLogin, async (req, res) => {
     try {
         if (!req.files || !req.files.beat) {
@@ -345,14 +360,15 @@ router.post('/admin/upload', requireLogin, async (req, res) => {
         const beatFile = req.files.beat;
         const coverFile = req.files.cover;
         
+        // Korrektur der Pfade relativ zum Projektstamm
         const beatFileName = `beat_${Date.now()}_${beatFile.name}`;
-        const beatPath = path.join(__dirname, '../uploads/beats', beatFileName); // Pfad korrigiert
+        const beatPath = path.join(__dirname, '../uploads/beats', beatFileName);
         await beatFile.mv(beatPath);
 
         let coverFileName = null;
         if (coverFile) {
             coverFileName = `cover_${Date.now()}_${coverFile.name}`;
-            const coverPath = path.join(__dirname, '../uploads/beats', coverFileName); // Pfad korrigiert
+            const coverPath = path.join(__dirname, '../uploads/covers', coverFileName);
             await coverFile.mv(coverPath);
         }
 
@@ -361,25 +377,17 @@ router.post('/admin/upload', requireLogin, async (req, res) => {
             description: req.body.description,
             bpm: req.body.bpm,
             key: req.body.key,
-            filePath: `beats/${beatFileName}`, // Dieser Pfad sollte stimmen
-            coverPath: coverFileName ? `beats/${coverFileName}` : null // Dieser auch
+            filePath: `beats/${beatFileName}`,
+            coverPath: coverFileName ? `covers/${coverFileName}` : null,
+            productUrl: req.body.productUrl // Diese Zeile hinzufügen
+      
         });
 
         await beat.save();
         res.redirect('/admin');
     } catch (error) {
-        console.error('Upload Error:', error);
+        console.error('Upload Fehler:', error);
         res.status(500).send('Fehler beim Upload: ' + error.message);
-    }
-});
-// Beats auflisten
-router.get('/beats-list', async (req, res) => {
-    try {
-        const beats = await Beat.find().sort({ createdAt: -1 });
-        res.json(beats);
-    } catch (error) {
-        console.error('Error fetching beats:', error);
-        res.status(500).json([]);
     }
 });
 
@@ -389,31 +397,34 @@ router.delete('/admin/beat/:id', requireLogin, async (req, res) => {
     try {
         const beat = await Beat.findById(req.params.id);
         if (!beat) {
-            return res.status(404).json({ error: 'Beat nicht gefunden' });
+            return res.status(404).json({ message: 'Beat nicht gefunden' });
         }
 
-        // Dateien löschen - Pfade korrigiert
+        // Dateien löschen
         if (beat.filePath) {
-            const beatFilePath = path.join(__dirname, '../beats', beat.filePath.replace('beats/', '')); // Pfad korrigiert
-            fs.unlink(beatFilePath, err => {
-                if (err) console.error('Fehler beim Löschen der Beat-Datei:', err);
-            });
+            const beatFilePath = path.join(__dirname, '../uploads', beat.filePath);
+            if (fs.existsSync(beatFilePath)) {
+                fs.unlinkSync(beatFilePath);
+            }
         }
+        
         if (beat.coverPath) {
-            const coverFilePath = path.join(__dirname, '../beats', beat.coverPath.replace('beats/', '')); // Pfad korrigiert
-            fs.unlink(coverFilePath, err => {
-                if (err) console.error('Fehler beim Löschen des Covers:', err);
-            });
+            const coverFilePath = path.join(__dirname, '../uploads', beat.coverPath);
+            if (fs.existsSync(coverFilePath)) {
+                fs.unlinkSync(coverFilePath);
+            }
         }
 
+        // Beat aus der Datenbank löschen
         await Beat.findByIdAndDelete(req.params.id);
         res.json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: 'Serverfehler beim Löschen' });
+        console.error('Delete Error:', error);
+        res.status(500).json({ message: error.message });
     }
 });
 
-// Füge diese Route in admin.js ein, direkt vor module.exports = router;
+
 
 // Beat bearbeiten Route (GET)
 router.get('/admin/beat/:id/edit', requireLogin, async (req, res) => {
@@ -452,6 +463,7 @@ router.get('/admin/beat/:id/edit', requireLogin, async (req, res) => {
                         }
                         .form-group input[type="text"],
                         .form-group input[type="number"],
+                        .form-group input[type="url"],
                         .form-group textarea,
                         .form-group select {
                             width: 100%;
@@ -469,18 +481,6 @@ router.get('/admin/beat/:id/edit', requireLogin, async (req, res) => {
                         }
                         button:hover {
                             background: #2a4365;
-                        }
-                        .current-files {
-                            margin: 10px 0;
-                            padding: 10px;
-                            background: #f8f8f8;
-                            border-radius: 4px;
-                        }
-                        .preview-image {
-                            max-width: 200px;
-                            max-height: 200px;
-                            margin: 10px 0;
-                            border-radius: 4px;
                         }
                     </style>
                 </head>
@@ -513,6 +513,11 @@ router.get('/admin/beat/:id/edit', requireLogin, async (req, res) => {
                                 </select>
                             </div>
 
+                            <div class="form-group">
+                                <label>Produkt URL:</label>
+                                <input type="url" name="productUrl" value="${beat.productUrl || ''}" placeholder="https://example.com/product">
+                            </div>
+
                             <button type="submit">Änderungen speichern</button>
                             <a href="/admin" style="margin-left: 10px; text-decoration: none;">Zurück</a>
                         </form>
@@ -527,7 +532,8 @@ router.get('/admin/beat/:id/edit', requireLogin, async (req, res) => {
                                 title: formData.get('title'),
                                 description: formData.get('description'),
                                 bpm: formData.get('bpm'),
-                                key: formData.get('key')
+                                key: formData.get('key'),
+                                productUrl: formData.get('productUrl')
                             };
 
                             try {
@@ -619,12 +625,21 @@ router.put('/admin/beat/:id', requireLogin, async (req, res) => {
             title: req.body.title,
             description: req.body.description,
             bpm: req.body.bpm,
-            key: req.body.key  // Fügen Sie das key-Feld hinzu
+            key: req.body.key,
+            productUrl: req.body.productUrl  // Diese Zeile hinzufügen
         });
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-
+router.get('/beats-list', async (req, res) => {
+    try {
+        const beats = await Beat.find().sort({ createdAt: -1 });
+        res.json(beats);
+    } catch (error) {
+        console.error('Error fetching beats:', error);
+        res.status(500).json({ error: 'Fehler beim Laden der Beats' });
+    }
+});
 module.exports = router;

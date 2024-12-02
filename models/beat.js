@@ -31,6 +31,10 @@ const beatSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    productUrl: {
+        type: String,
+        default: ''
+    },
     filePath: {
         type: String,
         required: true
