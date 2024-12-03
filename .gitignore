@@ -1,0 +1,7 @@
+/uploads
+/uploads/beats/*
+/uploads/covers/*
+node_modules/
+.env
+*.log
+.DS_Store
