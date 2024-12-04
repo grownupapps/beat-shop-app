@@ -39,7 +39,10 @@ const beatSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    coverPath: String,
+    coverPath: {
+        type: String,
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now

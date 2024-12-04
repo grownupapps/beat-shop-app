@@ -84,29 +84,9 @@ app.get('/', (req, res) => {
                         margin: 0 auto;
                     }
 
-                    .header {
-                        text-align: center;
-                        margin-bottom: 4rem;
-                        padding: 3rem 0;
-                        background: rgba(212, 175, 55, 0.05);
-                        border-radius: 20px;
-                        border: 1px solid rgba(212, 175, 55, 0.3);
-                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-                    }
+                    
 
-                    .header h1 {
-                        font-size: 3.5rem;
-                        font-weight: 700;
-                        margin-bottom: 1rem;
-                        color: #D4AF37;
-                        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-                    }
-
-                    .header p {
-                        font-size: 1.2rem;
-                        color: #D4AF37;
-                        opacity: 0.9;
-                    }
+                 
 
                     #beatsList {
                         display: grid;
@@ -133,23 +113,21 @@ app.get('/', (req, res) => {
                         box-shadow: 0 12px 30px rgba(212, 175, 55, 0.2);
                     }
 
-                    .wishlist-heart-button {
-                        position: absolute;
-                        top: 15px;
-                        right:15px;
-                        background: rgba(255, 255, 255, 0.9);
-                        border: none;
-                        cursor: pointer;
-                        padding: 8px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        transition: transform 0.2s ease;
-                        border-radius: 50%;
-                        z-index: 7;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                    }
-
+   .wishlist-heart-button {
+    position: absolute;
+    top: 15px;
+    right:15px;
+    background: transparent;  /* Komplett transparenter Hintergrund */
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    border-radius: 50%;
+    z-index: 7;
+}
                     .wishlist-heart-button:hover {
                         transform: scale(1.1);
                     }
@@ -307,11 +285,7 @@ app.get('/', (req, res) => {
                 </style>
             </head>
             <body>
-                <div class="container">
-                    <div class="header">
-                        <h1>Premium Beats</h1>
-                        <p>Entdecke deine nächste Hit-Produktion</p>
-                    </div>
+                
 
                     <div id="beatsList"></div>
                 </div>
@@ -360,7 +334,7 @@ app.get('/', (req, res) => {
                                     <div class="beat-content">
                                         \${beat.productUrl ? \`
                                             <button onclick="toggleWishlist(this, '\${beat.productUrl}')" class="wishlist-heart-button">
-                                                <svg class="heart-icon" viewBox="0 0 24 24" width="24" height="24">
+                                                <svg class="heart-icon" viewBox="0 0 24 24" width="28" height="28">
                                                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                                 </svg>
                                             </button>
