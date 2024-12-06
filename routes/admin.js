@@ -403,71 +403,86 @@ router.get('/admin', requireLogin, (req, res) => {
                 </div>
 
                 <script>
-                    async function loadBeats() {
-                        try {
-                            const response = await fetch('/beats-list');
-                            const beats = await response.json();
-                            const beatsListDiv = document.getElementById('beatsList');
-                            beatsListDiv.innerHTML = '<h2>Deine Beats</h2>';
-                            
-                            beats.forEach(beat => {
-                                const beatDiv = document.createElement('div');
-                                beatDiv.className = 'beat-card';
-                                beatDiv.innerHTML = \`
-                                    <div class="beat-content">
-                                        \${beat.coverPath ? \`<img src="/uploads/\${beat.coverPath}" class="beat-cover" alt="\${beat.title}">\` : ''}
-                                        <div class="beat-info">
-                                            <h3>\${beat.title}</h3>
-                                            <p>\${beat.description || ''}</p>
-                                            <p>BPM: \${beat.bpm || 'N/A'} | Key: \${beat.key || 'N/A'}</p>
-                                            <p>\${beat.productUrl ? \`Produkt URL: \${beat.productUrl}\` : ''}</p>
-                                            <div class="beat-controls">
-                                                <button onclick="editBeat('\${beat._id}')" class="btn btn-primary">Bearbeiten</button>
-                                                <button onclick="deleteBeat('\${beat._id}')" class="btn btn-danger">Löschen</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <audio controls>
-                                        <source src="/uploads/\${beat.filePath}" type="audio/mpeg">
-                                    </audio>
-                                \`;
-                                beatsListDiv.appendChild(beatDiv);
-                            });
-                        } catch (error) {
-                            console.error('Fehler beim Laden der Beats:', error);
-                        }
+    function setupAudioControl(audioElements) {
+        audioElements.forEach(audio => {
+            audio.addEventListener('play', () => {
+                audioElements.forEach(otherAudio => {
+                    if (otherAudio !== audio && !otherAudio.paused) {
+                        otherAudio.pause();
+                        otherAudio.currentTime = 0;
                     }
+                });
+            });
+        });
+    }
 
-                    async function deleteBeat(beatId) {
-                        if (!confirm('Möchtest du diesen Beat wirklich löschen?')) {
-                            return;
-                        }
+    async function loadBeats() {
+        try {
+            const response = await fetch('/beats-list');
+            const beats = await response.json();
+            const beatsListDiv = document.getElementById('beatsList');
+            beatsListDiv.innerHTML = '<h2>Deine Beats</h2>';
+            beats.forEach(beat => {
+                const beatDiv = document.createElement('div');
+                beatDiv.className = 'beat-card';
+                beatDiv.innerHTML = \`
+                    <div class="beat-content">
+                        \${beat.coverPath ? \`<img src="/uploads/\${beat.coverPath}" class="beat-cover" alt="\${beat.title}">\` : ''}
+                        <div class="beat-info">
+                            <h3>\${beat.title}</h3>
+                            <p>\${beat.description || ''}</p>
+                            <p>BPM: \${beat.bpm || 'N/A'} | Key: \${beat.key || 'N/A'}</p>
+                            <p>\${beat.productUrl ? \`Produkt URL: \${beat.productUrl}\` : ''}</p>
+                            <div class="beat-controls">
+                                <button onclick="editBeat('\${beat._id}')" class="btn btn-primary">Bearbeiten</button>
+                                <button onclick="deleteBeat('\${beat._id}')" class="btn btn-danger">Löschen</button>
+                            </div>
+                        </div>
+                    </div>
+                    <audio controls>
+                        <source src="/uploads/\${beat.filePath}" type="audio/mpeg">
+                    </audio>
+                \`;
+                beatsListDiv.appendChild(beatDiv);
+            });
+            
+            // Nach dem Laden der Beats Audio-Control aktivieren
+            const audioElements = document.querySelectorAll('audio');
+            setupAudioControl(Array.from(audioElements));
+            
+        } catch (error) {
+            console.error('Fehler beim Laden der Beats:', error);
+        }
+    }
 
-                        try {
-                            const response = await fetch(\`/admin/beat/\${beatId}\`, {
-                                method: 'DELETE'
-                            });
+    async function deleteBeat(beatId) {
+        if (!confirm('Möchtest du diesen Beat wirklich löschen?')) {
+            return;
+        }
+        try {
+            const response = await fetch(\`/admin/beat/\${beatId}\`, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                alert('Beat erfolgreich gelöscht');
+                loadBeats();
+            } else {
+                const error = await response.json();
+                alert('Fehler beim Löschen: ' + error.message);
+            }
+        } catch (error) {
+            console.error('Fehler:', error);
+            alert('Fehler beim Löschen des Beats');
+        }
+    }
 
-                            if (response.ok) {
-                                alert('Beat erfolgreich gelöscht');
-                                loadBeats();
-                            } else {
-                                const error = await response.json();
-                                alert('Fehler beim Löschen: ' + error.message);
-                            }
-                        } catch (error) {
-                            console.error('Fehler:', error);
-                            alert('Fehler beim Löschen des Beats');
-                        }
-                    }
+    function editBeat(beatId) {
+        window.location.href = '/admin/beat/' + beatId + '/edit';
+    }
 
-                    function editBeat(beatId) {
-                        window.location.href = '/admin/beat/' + beatId + '/edit';
-                    }
-
-                    // Initial Beats laden
-                    loadBeats();
-                </script>
+    // Initial Beats laden
+    loadBeats();
+</script>
             </body>
         </html>
     `);

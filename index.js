@@ -62,6 +62,7 @@ app.get('/', (req, res) => {
         <html>
             <head>
                 <title>Premium Beats</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
                 <style>
                     * {
@@ -83,10 +84,6 @@ app.get('/', (req, res) => {
                         max-width: 1400px;
                         margin: 0 auto;
                     }
-
-                    
-
-                 
 
                     #beatsList {
                         display: grid;
@@ -113,21 +110,22 @@ app.get('/', (req, res) => {
                         box-shadow: 0 12px 30px rgba(212, 175, 55, 0.2);
                     }
 
-   .wishlist-heart-button {
-    position: absolute;
-    top: 15px;
-    right:15px;
-    background: transparent;  /* Komplett transparenter Hintergrund */
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease;
-    border-radius: 50%;
-    z-index: 7;
-}
+                    .wishlist-heart-button {
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        background: transparent;
+                        border: none;
+                        cursor: pointer;
+                        padding: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: transform 0.2s ease;
+                        border-radius: 50%;
+                        z-index: 7;
+                    }
+
                     .wishlist-heart-button:hover {
                         transform: scale(1.1);
                     }
@@ -266,6 +264,9 @@ app.get('/', (req, res) => {
                             width: 140px;
                             height: 140px;
                         }
+                        body {
+                            padding: 1rem;
+                        }
                     }
 
                     @media (max-width: 576px) {
@@ -281,48 +282,91 @@ app.get('/', (req, res) => {
                             width: 160px;
                             height: 160px;
                         }
+                        .beat-info h3 {
+                            font-size: 1.2rem;
+                        }
+                        .beat-metadata {
+                            font-size: 0.8rem;
+                            padding: 0.3rem 0.6rem;
+                        }
+                        body {
+                            padding: 0.5rem;
+                        }
+                    }
+
+                    @media (orientation: landscape) and (max-height: 500px) {
+                        .beat-content {
+                            flex-direction: row;
+                        }
+                        .beat-cover {
+                            width: 100px;
+                            height: 100px;
+                        }
                     }
                 </style>
             </head>
             <body>
-                
-
-                    <div id="beatsList"></div>
-                </div>
-
+                <div id="beatsList"></div>
                 <div class="wishlist-notification">Markierte Beats werden in deiner Shopify Wishlist gespeichert!</div>
 
                 <script>
+                    // Audio Control Funktionen
+                    function setupAudioControl(audioElements) {
+                        audioElements.forEach(audio => {
+                            audio.addEventListener('play', () => {
+                                audioElements.forEach(otherAudio => {
+                                    if (otherAudio !== audio && !otherAudio.paused) {
+                                        otherAudio.pause();
+                                        otherAudio.currentTime = 0;
+                                    }
+                                });
+                            });
+                        });
+                    }
+
+                    function initAudioControl() {
+                        const audioElements = Array.from(document.querySelectorAll('audio'));
+                        setupAudioControl(audioElements);
+                        
+                        const observer = new MutationObserver((mutations) => {
+                            mutations.forEach((mutation) => {
+                                if (mutation.addedNodes.length) {
+                                    const newAudioElements = Array.from(document.querySelectorAll('audio'));
+                                    setupAudioControl(newAudioElements);
+                                }
+                            });
+                        });
+                        
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true
+                        });
+                    }
+
                     function toggleWishlist(button, productUrl) {
                         const heartIcon = button.querySelector('.heart-icon');
                         const isActive = heartIcon.classList.contains('active');
                         const notification = document.querySelector('.wishlist-notification');
                         
-                        // Toggle Animation
                         heartIcon.classList.toggle('active');
-                        
-                        // Zeige Notification
                         notification.classList.add('show');
                         
-                        // Entferne Notification nach 5 Sekunden
                         setTimeout(() => {
                             notification.classList.remove('show');
                         }, 5000);
                         
-                        // Extrahiere die Produkt-ID aus der URL
                         const productId = productUrl.split('/products/')[1]?.split('?')[0];
                         
                         if (productId) {
                             if (!isActive) {
                                 console.log('Zur Wunschliste hinzugefügt:', productId);
-                                // Hier später Shopify Wishlist API Call
                             } else {
                                 console.log('Von Wunschliste entfernt:', productId);
-                                // Hier später Shopify Wishlist API Call für Entfernen
                             }
                         }
                     }
 
+                    // Beats laden und anzeigen
                     fetch('/beats-list')
                         .then(res => res.json())
                         .then(beats => {
@@ -333,7 +377,9 @@ app.get('/', (req, res) => {
                                 beatDiv.innerHTML = \`
                                     <div class="beat-content">
                                         \${beat.productUrl ? \`
-                                            <button onclick="toggleWishlist(this, '\${beat.productUrl}')" class="wishlist-heart-button">
+                                            <button onclick="toggleWishlist(this, '\${beat.productUrl}')" 
+                                                    class="wishlist-heart-button"
+                                                    aria-label="Zur Wunschliste hinzufügen">
                                                 <svg class="heart-icon" viewBox="0 0 24 24" width="28" height="28">
                                                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                                 </svg>
@@ -346,6 +392,10 @@ app.get('/', (req, res) => {
                                             <div class="beat-metadata-container">
                                                 <span class="beat-metadata">BPM: \${beat.bpm || 'N/A'}</span>
                                                 <span class="beat-metadata">Key: \${beat.key || 'N/A'}</span>
+                                               
+
+
+
                                                 \${beat.productUrl ? \`
                                                     <a href="\${beat.productUrl}" target="_blank" class="product-button">
                                                         Zum Produkt
@@ -362,7 +412,12 @@ app.get('/', (req, res) => {
                                 \`;
                                 beatsListDiv.appendChild(beatDiv);
                             });
+                            // Nach dem Laden der Beats Audio-Control initialisieren
+                            initAudioControl();
                         });
+
+                    // Initial Audio-Control aufrufen
+                    document.addEventListener('DOMContentLoaded', initAudioControl);
                 </script>
             </body>
         </html>
